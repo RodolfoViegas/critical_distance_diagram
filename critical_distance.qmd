@@ -1,0 +1,199 @@
+---
+author: 
+    - Rodolfo Viegas de Albuquerque
+    - Prof. Dr. João Fausto Lorenzato de Oliveira 
+lang: pt
+title: "Diagrama de Distância Crítica"
+title-slide-attributes:
+    data-background-image: ppgec_poli.png
+    data-background-size: 20% 
+    data-background-position: left 10% top 5%
+format: 
+    revealjs:
+        logo: ppgec_logo.png
+        css: style.css
+        slide-number: true
+
+date: '08/05/2025'
+date-format: DD/MM/YYYY
+---
+
+
+# Testes de Hipóteses
+
+## Por que fazer teste de hipóteses?
+
+::: {.incremental}
+
+- Validar generalizações;
+- Pré-processamento;
+- Comparar performance de modelos.
+:::
+
+## Exemplos
+
+::: {.incremental}
+- Verificar se a variância dos resíduos é constante (homocedasticidade); 
+- Teste A/B;
+- Testar se o $\beta_1$ existe, ou seja, diferente de zero;
+- Buscar evidências se um **classificador** é mais acurado que outro por meio de métricas de erro.
+:::
+
+# Qual é o melhor teste de Hipótese para determinar o modelo dentre tantos?
+
+## Prosposta de Janez Demšar
+
+![doi/10.5555/1248547.1248548](resume.png){width=70% .lightbox #fig-article}
+
+## Problemas
+
+- Não havia até então um padrão de testes de hipótese. A forma mais estuda era a comparação de 2 modelos num único *dataset*, geralmente formas de t-teste.
+- Comparação de de mais de 2 modelos de multiplos conjuntos de dados não era estudada.
+- Usavam o teste t várias vezes comparando mais de um método em varios datasets.
+
+## Analise de Artigos
+
+O autor investigou artigos de 1999 a 2003 da International Conference on Machine Learning, a maior parte destes artigos usou o t-teste de 3 formas:
+
+ - um modelo contra outro;
+ - um contra vários;
+ - e cada um contra cada um;
+
+Alguns artigos mostrara seus resultados somente com a média dos erros.
+
+## Dois métodos e muitos *datasets*
+
+Após analisar média de classificadores, teste t pareado e teste do sinal, Demsar concluiu que o mais adequado é o teste de Wilkoxon.
+
+## Muitos métodos e muitos conjuntos de dados
+
+Um teste possível seria o *repeated mesures* ANOVA, que verifica de performance dos métodos é igual ($H_0$), posteriormente usa-se o teste *post hoc* de Tukey para saber qual dos métodos é o tem performance melhor. Há, porém, condições:
+
+- é preciso que a distribuição seja normal e
+- que a variância seja constante.
+
+Ambas condições muito provavelmente violadas no contexto de ML.
+
+## Teste de Friedman
+
+ O teste de Friedman é um alternativa não-paramétrica do *repeated mesures* ANOVA, ou seja, não precisa de pressupostos; em vez de usar o valor da média, ele ranquea os valores dos modelos.
+
+ - $H_0:$ todos os métodos são iguais
+ - $H_a:$ pelo menos um é diferente
+
+ Há uma *thumb rule* para ele $N>10$ e $k>5$, em que $N$ é o número de *datasets* e $k$ o número de métodos
+
+
+## *Post Hoc* de Nemenyi
+
+Se a hipótese nula for rejeitada, então é possível aplicar Nemenyi e verificar quais métodos são significativamente diferentes.
+
+## Autorank Python
+
+Para usuários de Python há a biblioteca Autorank que automatiza todos testes.
+Faz as verificões necessárias como normalidade e homocedasticidade, e direciona para quais testes aplicar 
+
+```{.python code-line-numbers="5|7|8|9|10"}
+import pandas as pd
+import matplotlib.pyplot as plt
+from autorank import autorank, create_report, plot_stats
+
+results = autorank(data)
+
+create_report(results)
+plot_stats(data)
+plt.show()
+```
+## Mini experimento com Autorank
+
+::: {.panel-tabset}
+
+### Código
+```{.python}
+import pandas as pd
+import matplotlib.pyplot as plt
+from autorank import autorank, create_report, plot_stats
+
+data = pd.read_csv('./rmse.csv')
+res = autorank(data, alpha=0.05, verbose=False, order='ascending')
+create_report(res)
+
+plot_stats(res)
+plt.show()
+
+```
+### Report
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+from autorank import autorank, create_report, plot_stats
+
+data = pd.read_csv('./rmse.csv')
+res = autorank(data, alpha=0.05, verbose=False, order='ascending')
+create_report(res)
+```
+
+### Tabela
+```{python}
+print(data)
+```
+
+### Plot
+```{python}
+plt.figure(figsize=(18,6))
+plot_stats(res)
+plt.show()
+```
+:::
+
+## Para Usuários de R
+
+A linguagem R tem mais ferramentas estatísticas, mas ainda não há um framework que integre todos como autorank, no entanto não significa que seja difícil utilizá-la.
+
+```{.r}
+install.packages("tsutils")
+
+library(tsutils)
+
+# Para dois modelos
+result <- wilcox.test(data[,1], data[,2], 
+                      alternative = "two.sided", 
+                      paired = TRUE, 
+                      conf.level = 0.95)
+
+# Mais de três modelos
+result <- nemenyi(data,plottype='mcb')
+result
+```
+## Mini Experiemento com R
+
+::: {.panel-tabset}
+
+### Código
+
+```{.r}
+library(tsutils)
+
+data <- read.csv('./rmse.csv')
+result <- nemenyi(data,plottype='mcb')
+result
+
+```
+### Plot
+```{r}
+library(tsutils)
+data <- read.csv('./rmse.csv')
+result <- nemenyi(data,plottype='vmcb')
+```
+### Tabela
+
+```{r}
+data
+```
+
+### Resultado
+```{r}
+result
+```
+:::
