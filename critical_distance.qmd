@@ -181,9 +181,7 @@ result
 
 ```
 ### Plot
-```{r echo: false}
-rsconnect::writeManifest()
-```
+
 
 ```{r}
 library(tsutils)
