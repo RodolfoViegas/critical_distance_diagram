@@ -2847,6 +2847,9 @@
     "critical_distance_files/figure-revealjs/unnamed-chunk-3-2.png": {
       "checksum": "5f922ea6592c6cafc80d6e7d57b1ff3a"
     },
+    "critical_distance_files/figure-revealjs/unnamed-chunk-4-1.png": {
+      "checksum": "07d4d9cbda62cc4345c2835a49afd2c3"
+    },
     "critical_distance_files/figure-revealjs/unnamed-chunk-4-5.png": {
       "checksum": "07d4d9cbda62cc4345c2835a49afd2c3"
     },
@@ -3121,7 +3124,7 @@
       "checksum": "9c28a4d1f1502771665328f6abb091c0"
     },
     "critical_distance.html": {
-      "checksum": "3a8fdacd077ddba7326550425df47270"
+      "checksum": "8c9516014f9e879f93965d1ea1588023"
     },
     "critical_distance.qmd": {
       "checksum": "05cd36144f40638897cf97ba66bf644f"
