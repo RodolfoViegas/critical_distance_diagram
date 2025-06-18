@@ -181,6 +181,10 @@ result
 
 ```
 ### Plot
+```{r echo: false}
+rsconnect::writeManifest()
+```
+
 ```{r}
 library(tsutils)
 data <- read.csv('./rmse.csv')
